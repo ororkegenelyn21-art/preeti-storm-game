@@ -13,7 +13,7 @@
       color:white;
     }
     h1 { margin-top:20px; text-shadow:2px 2px #000; font-size:32px; }
-    canvas { width:95%; max-width:400px; height:auto; border:3px solid #000; margin-top:10px; background:rgba(255,255,255,0.9); }
+    canvas { width:400px; height:600px; border:3px solid #000; margin-top:10px; background:rgba(255,255,255,0.9); }
     #info { font-size:20px; margin-top:10px; }
     #gameButton { font-size:20px; margin:10px; padding:12px 20px; border:none; border-radius:10px; background:#33ccff; color:#fff; }
     #controls {
@@ -35,7 +35,7 @@
 </head>
 <body>
   <h1>🐦 Preeti’s Storm Adventure 🐦</h1>
-  <canvas id="gameCanvas" width="400" height="300"></canvas>
+  <canvas id="gameCanvas" width="400" height="600"></canvas>
   <div id="info">Survive 60 seconds to win! Use arrows or buttons to dodge raindrops.</div>
   <button id="gameButton" onclick="startGame()">Start Game</button>
   <div id="controls">
@@ -62,9 +62,9 @@
     let preetiX, preetiY, drops, lives, playing, score, speed, countdown, countdownInterval;
 
     function startGame(){
-      preetiX=180; preetiY=230;
+      preetiX=180; preetiY=520; // adjusted for taller canvas
       lives=5; score=0; speed=1.2;
-      drops=[]; for(let i=0;i<12;i++){drops.push({x:Math.random()*380,y:Math.random()*-300});}
+      drops=[]; for(let i=0;i<15;i++){drops.push({x:Math.random()*380,y:Math.random()*-600});}
       playing=true;
       bgMusic.volume=0.4; bgMusic.play();
       countdown=60; // 60 seconds
@@ -76,14 +76,14 @@
     }
 
     function draw(){
-      ctx.clearRect(0,0,400,300);
+      ctx.clearRect(0,0,400,600);
       if(preetiImg.complete){ ctx.drawImage(preetiImg,preetiX,preetiY,50,50); }
       else { ctx.fillStyle="green"; ctx.fillRect(preetiX,preetiY,40,40); }
       drops.forEach(d=>{
         if(dropImg.complete){ ctx.drawImage(dropImg,d.x,d.y,15,25); }
         else { ctx.fillStyle="blue"; ctx.fillRect(d.x,d.y,10,20); }
         d.y+=speed;
-        if(d.y>300){d.y=Math.random()*-100; d.x=Math.random()*380; score++; }
+        if(d.y>600){d.y=Math.random()*-100; d.x=Math.random()*380; score++; }
         if(d.x<preetiX+40 && d.x+10>preetiX && d.y<preetiY+40 && d.y+20>preetiY){
           lives--; splashSound.play(); flashScreen();
           d.y=Math.random()*-100; d.x=Math.random()*380;
@@ -102,8 +102,8 @@
     function endGame(win){
       playing=false; clearInterval(countdownInterval);
       ctx.fillStyle= win ? "green" : "red";
-      ctx.font="22px ArcadeClassic, sans-serif";
-      ctx.fillText(win ? "Preeti survived the storm!" : "Preeti got too wet! Try again!",40,150);
+      ctx.font="24px ArcadeClassic, sans-serif";
+      ctx.fillText(win ? "Preeti survived the storm!" : "Preeti got too wet! Try again!",40,300);
       if(win){ cheerSound.play(); }
       gameButton.textContent="Restart Game";
     }
