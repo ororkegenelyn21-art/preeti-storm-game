@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Preeti’s Storm Game</title>
+  <style>
+    body {
+      margin:0;
+      font-family:'ArcadeClassic', sans-serif;
+      text-align:center;
+      background:#333 url('storm.jpg') no-repeat center center fixed;
+      background-size:cover;
+      color:white;
+    }
+    h1 { margin-top:20px; text-shadow:2px 2px #000; font-size:32px; }
+    canvas { width:95%; max-width:400px; height:auto; border:3px solid #000; margin-top:10px; background:rgba(255,255,255,0.9); }
+    #info { font-size:20px; margin-top:10px; }
+    #gameButton { font-size:20px; margin:10px; padding:12px 20px; border:none; border-radius:10px; background:#33ccff; color:#fff; }
+    #controls {
+      margin-top:15px;
+      display:flex; justify-content:center; gap:20px;
+    }
+    #controls button {
+      font-size:24px; padding:15px 25px;
+      border:none; border-radius:12px;
+      background:#33ccff; color:#fff; cursor:pointer;
+    }
+    #controls button:hover { background:#0099cc; }
+
+    /* Arcade Classic font integration */
+    @font-face {
+      font-family: 'ArcadeClassic';
+      src: url('fonts/ArcadeClassic.ttf') format('truetype');
+    }
+  </style>
+</head>
+<body>
+  <h1>🐦 Preeti’s Storm Adventure 🐦</h1>
+  <canvas id="gameCanvas" width="400" height="300"></canvas>
+  <div id="info">Survive 60 seconds to win! Use arrows or buttons to dodge raindrops.</div>
+  <button id="gameButton" onclick="startGame()">Start Game</button>
+  <div id="controls">
+    <button onclick="moveLeft()">⬅️ Left</button>
+    <button onclick="moveRight()">➡️ Right</button>
+  </div>
+
+  <!-- Sounds -->
+  <audio id="splash" src="splash.mp3"></audio>
+  <audio id="bgMusic" src="arcade_music.mp3" loop></audio>
+  <audio id="cheer" src="chirp.mp3"></audio>
+
+  <script>
+    const canvas=document.getElementById("gameCanvas");
+    const ctx=canvas.getContext("2d");
+    const splashSound=document.getElementById("splash");
+    const bgMusic=document.getElementById("bgMusic");
+    const cheerSound=document.getElementById("cheer");
+    const gameButton=document.getElementById("gameButton");
+
+    const preetiImg=new Image(); preetiImg.src="bird.png";
+    const dropImg=new Image(); dropImg.src="raindrop.png";
+
+    let preetiX, preetiY, drops, lives, playing, timer, score, speed, countdown, countdownInterval;
+
+    function startGame(){
+      preetiX=180; preetiY=230;
+      lives=5; score=0; speed=1.2;
+      drops=[]; for(let i=0;i<12;i++){drops.push({x:Math.random()*380,y:Math.random()*-300});}
+      playing=true;
+      bgMusic.volume=0.4; bgMusic.play();
+      countdown=60; // 60 seconds
+      countdownInterval=setInterval(()=>{
+        countdown--;
+        if(countdown<=0){ clearInterval(countdownInterval); endGame(true); }
+      },1000);
+      loop();
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,400,300);
+      if(preetiImg.complete){ ctx.drawImage(preetiImg,preetiX,preetiY,50,50); }
+      else { ctx.fillStyle="green"; ctx.fillRect(preetiX,preetiY,40,40); }
+      drops.forEach(d=>{
+        if(dropImg.complete){ ctx.drawImage(dropImg,d.x,d.y,15,25); }
+        else { ctx.fillStyle="blue"; ctx.fillRect(d.x,d.y,10,20); }
+        d.y+=speed;
+        if(d.y>300){d.y=Math.random()*-100; d.x=Math.random()*380; score++; }
+        if(d.x<preetiX+40 && d.x+10>preetiX && d.y<preetiY+40 && d.y+20>preetiY){
+          lives--; splashSound.play(); flashScreen();
+          d.y=Math.random()*-100; d.x=Math.random()*380;
+        }
+      });
+      ctx.fillStyle="black"; ctx.font="18px ArcadeClassic, sans-serif";
+      ctx.fillText("Lives: "+lives,10,20);
+      ctx.fillText("Score: "+score,300,20);
+      ctx.fillText("Time left: "+countdown+"s",140,20);
+      if(lives<=0){ endGame(false); }
+      if(score%25===0 && speed<3){ speed+=0.2; }
+    }
+
+    function loop(){ if(!playing) return; draw(); requestAnimationFrame(loop); }
+
+    function endGame(win){
+      playing=false; clearInterval(countdownInterval);
+      ctx.fillStyle= win ? "green" : "red";
+      ctx.font="24px ArcadeClassic, sans-serif";
+      ctx.fillText(win ? "Preeti survived the storm!" : "Preeti got too wet! Try again!",40,150);
+      if(win){ cheerSound.play(); }
+      gameButton.textContent="Restart Game";
+    }
+
+    window.addEventListener("keydown",e=>{
+      if(!playing) return;
+      if(e.key==="ArrowLeft") moveLeft();
+      if(e.key==="ArrowRight") moveRight();
+    });
+    function moveLeft(){ if(playing && preetiX>0) preetiX-=20; }
+    function moveRight(){ if(playing && preetiX<350) preetiX+=20; }
+
+    function flashScreen(){
+      canvas.style.backgroundColor="rgba(255,0,0,0.5)";
+      setTimeout(()=>{canvas.style.backgroundColor="rgba(255,255,255,0.9)";},200);
+    }
+  </script>
+</body>
+</html>
