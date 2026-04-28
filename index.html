@@ -102,7 +102,7 @@
     function endGame(win){
       playing=false; clearInterval(countdownInterval);
       ctx.fillStyle= win ? "green" : "red";
-      ctx.font="28px ArcadeClassic, sans-serif";
+      ctx.font="22px ArcadeClassic, sans-serif";
       ctx.fillText(win ? "Preeti survived the storm!" : "Preeti got too wet! Try again!",40,150);
       if(win){ cheerSound.play(); }
       gameButton.textContent="Restart Game";
