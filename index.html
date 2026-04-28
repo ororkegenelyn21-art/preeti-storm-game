@@ -27,7 +27,6 @@
     }
     #controls button:hover { background:#0099cc; }
 
-    /* Arcade Classic font integration */
     @font-face {
       font-family: 'ArcadeClassic';
       src: url('fonts/ArcadeClassic.ttf') format('truetype');
@@ -60,7 +59,7 @@
     const preetiImg=new Image(); preetiImg.src="bird.png";
     const dropImg=new Image(); dropImg.src="raindrop.png";
 
-    let preetiX, preetiY, drops, lives, playing, timer, score, speed, countdown, countdownInterval;
+    let preetiX, preetiY, drops, lives, playing, score, speed, countdown, countdownInterval;
 
     function startGame(){
       preetiX=180; preetiY=230;
@@ -103,17 +102,25 @@
     function endGame(win){
       playing=false; clearInterval(countdownInterval);
       ctx.fillStyle= win ? "green" : "red";
-      ctx.font="24px ArcadeClassic, sans-serif";
+      ctx.font="28px ArcadeClassic, sans-serif";
       ctx.fillText(win ? "Preeti survived the storm!" : "Preeti got too wet! Try again!",40,150);
       if(win){ cheerSound.play(); }
       gameButton.textContent="Restart Game";
     }
 
+    // Arrow key controls with preventDefault
     window.addEventListener("keydown",e=>{
       if(!playing) return;
-      if(e.key==="ArrowLeft") moveLeft();
-      if(e.key==="ArrowRight") moveRight();
+      if(e.key==="ArrowLeft"){
+        e.preventDefault();
+        moveLeft();
+      }
+      if(e.key==="ArrowRight"){
+        e.preventDefault();
+        moveRight();
+      }
     });
+
     function moveLeft(){ if(playing && preetiX>0) preetiX-=20; }
     function moveRight(){ if(playing && preetiX<350) preetiX+=20; }
 
